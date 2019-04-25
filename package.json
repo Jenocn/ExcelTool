@@ -1,0 +1,25 @@
+{
+  "name": "exceltool",
+  "version": "1.0.0",
+  "description": "Excel to json and xml.",
+  "main": "./app/js/main.js",
+  "scripts": {
+    "test": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jenocn/ExcelTool.git"
+  },
+  "author": "Jenocn",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jenocn/ExcelTool/issues"
+  },
+  "homepage": "https://github.com/Jenocn/ExcelTool#readme",
+  "dependencies": {
+    "xlsx": "^0.14.2"
+  },
+  "devDependencies": {
+    "@types/node": "^11.13.7",
+  }
+}
