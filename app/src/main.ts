@@ -1,4 +1,4 @@
-import Electron, { app, BrowserWindow } from 'electron';
+import Electron, { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import Excel from './Excel'
 
@@ -15,9 +15,7 @@ function CreateWindow(): void {
 
     let excel = new Excel();
     excel.Open(dir + "res/test.xlsx");
-    
-    win.webContents.insertText(excel.ToJsonString());
-    win.webContents.insertText(excel.ToXmlString());
+    excel.ToXmlString();
 }
 
 app.on("ready", CreateWindow);

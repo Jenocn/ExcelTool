@@ -3,10 +3,12 @@ import XLSX, { WorkBook } from 'xlsx';
 export default class Excel {
     private _data: any = {};
     private _xmlString: string = "";
+    private _jsonString: string = "";
 
     public Open(file: string) {
         this._data = {};
         this._xmlString = "";
+        this._jsonString = "";
         const workbook = XLSX.readFile(file);
         this._data = ((workbook: WorkBook): any => {
             if (workbook.SheetNames.length == 0) {
@@ -23,7 +25,13 @@ export default class Excel {
     }
 
     public ToJsonString(): string {
-        return JSON.stringify(this._data);
+        if (!this._data || this._data.length == 0) {
+            return "";
+        }
+        if (this._jsonString == "") {
+            this._jsonString = JSON.stringify(this._data);
+        }
+        return this._jsonString;
     }
 
     public ToXmlString(): string {
