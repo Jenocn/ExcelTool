@@ -1,3 +1,7 @@
 div {
 	
 }
+
+#xlsx_list {
+	overflow-y: auto;
+}

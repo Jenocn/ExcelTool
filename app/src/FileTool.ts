@@ -3,9 +3,12 @@ import path from 'path';
 
 export default class FileTool {
     public static GetFilesFromDirectory(dir: string, filter?: string[]): string[] {
+        if (!fs.existsSync(dir)) {
+            return [];
+        }
         let tempFiles = fs.readdirSync(dir);
         if (!filter || filter.length == 0) {
-            return tempFiles;
+            return [];
         }
         let files: string[] = [];
         for (const item of tempFiles) {
@@ -17,13 +20,18 @@ export default class FileTool {
         return files;
     }
 
-    public static GetPureFilename(absolution: string): string {
-        let ext = path.extname(absolution);
-        let ret = absolution.replace(ext, "").replace(/[\\]/g, "/");
-        let index = ret.lastIndexOf("/") + 1;
-        ret = ret.substr(index, ret.length - index);
-        return ret;
+    public static GetDirectoryFromAbsolutionPath(absolution: string): string {
+        return path.dirname(absolution);
     }
+
+    public static GetFilenameFromAbsolutionPath(absolution: string): string {
+        return path.basename(absolution);
+    }
+
+    public static GetPureFilenameFromAbsolutionPath(absolution: string): string {
+        return path.basename(absolution, path.extname(absolution));
+    }
+
 
     public static WriteToFile(path: string, str: string) {
         fs.writeFile(path, str, {}, (err) => {

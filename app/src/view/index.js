@@ -4,8 +4,8 @@ var vm = new Vue({
 	el: "#app",
 	data: {
 		files: [],
-		srcDir: "./src/",
-		outDir: "./out/"
+		srcDir: "./src",
+		outDir: "./out"
 	},
 	created: function () {
 		electron.ipcRenderer.on("index-init", (e, srcDir, outDir, files)=>{

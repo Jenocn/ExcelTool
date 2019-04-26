@@ -13,7 +13,7 @@
         <button v-on:click="OnOutDir">导出目录</button> {{outDir}}<br>
         <button v-on:click="OnExport('XML')">导出 XML</button>
         <button v-on:click="OnExport('JSON')">导出 JSON</button><br>
-        <ul>
+        <ul id="xlsx_list">
             <li v-for="file in files">{{file}}</li>
         </ul>
     </div>
