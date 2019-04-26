@@ -1,18 +1,38 @@
-import Electron, { app, BrowserWindow, ipcMain, dialog, MessageBoxOptions } from 'electron';
+import Electron, { app, BrowserWindow, ipcMain, dialog, MessageBoxOptions, Menu } from 'electron';
 import FileTool from './FileTool'
 import path from 'path';
 import Excel from './Excel'
 import UserData from './UserData';
 
-let win = null;
-let winOption = {
+let win: BrowserWindow | null = null;
+const winOption = {
     width: 800,
     height: 600
 };
 
+const menuTemplate = [
+    {
+        label: "File",
+        submenu: [
+            {
+                label: "Exit",
+                click: ()=>{
+                    app.quit();
+                }
+            }
+        ]
+    }
+];
+
 function CreateWindow(): void {
     win = new BrowserWindow(winOption);
+    win.on("closed", ()=>{
+        win = null;
+        UserData.SaveToFile();
+        app.exit(0);
+    });
     const dir = path.join(__dirname, "../");
+    win.setMenu(Menu.buildFromTemplate(menuTemplate));
     win.loadFile(dir + "index.html");
     // win.webContents.openDevTools();
 }
@@ -23,15 +43,9 @@ function _OnReady(): void {
     CreateWindow();
 }
 
-function _OnQuit(): void {
-    win = null;
-    UserData.SaveToFile();
-}
-
 app.on("ready", _OnReady);
-app.on("quit", _OnQuit);
 
-ipcMain.on("request-init", (event: Electron.Event)=>{
+ipcMain.on("request-init", (event: Electron.Event) => {
 
     let outDir = UserData.GetValue("outDir", "./out");
     let srcDir = UserData.GetValue("srcDir", "./src");
