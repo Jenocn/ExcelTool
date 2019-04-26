@@ -1,4 +1,4 @@
-import Electron, { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import Electron, { app, BrowserWindow, ipcMain, dialog, MessageBoxOptions } from 'electron';
 import path from 'path';
 import Excel from './Excel'
 import fs from 'fs'
@@ -9,7 +9,8 @@ let winOption = {
     height: 600
 };
 
-let _files:string[] = [];
+let _srcDir: string = "";
+let _srcFiles: string[] = [];
 let _outDir = "";
 
 function CreateWindow(): void {
@@ -20,41 +21,71 @@ function CreateWindow(): void {
 }
 
 app.on("ready", CreateWindow);
-app.on("quit", ()=>{
+app.on("quit", () => {
     win = null;
 })
 
-ipcMain.on("open-file-dialog-select", (event: Electron.Event)=>{
+ipcMain.on("open-file-dialog-select", (event: Electron.Event) => {
     dialog.showOpenDialog({
-        properties:["openFile", "multiSelections"]
-    }, (files)=>{
-        if (files) {
-            event.sender.send("selected-directory", files);
-            _files = files;
+        properties: ["openDirectory"],
+    }, (dir: string[]) => {
+        if (dir && dir.length > 0) {
+            _srcDir = dir[0];
+            let allFiles = fs.readdirSync(_srcDir);
+            for (const item of allFiles) {
+                let extName = path.extname(item);
+                if (extName == ".xlsx" || extName == ".xls") {
+                    _srcFiles.push(item);
+                }
+            }
+            event.sender.send("selected-directory", _srcDir, _srcFiles);
         }
     });
 });
 
-ipcMain.on("open-file-dialog-out", (event: Electron.Event)=>{
+ipcMain.on("open-file-dialog-out", (event: Electron.Event) => {
     dialog.showOpenDialog({
-        properties:["openFile", "openDirectory"]
-    }, (dir)=>{
-        if (dir) {
-            event.sender.send("out-directory", dir);
+        properties: ["openFile", "openDirectory"]
+    }, (dir: string[]) => {
+        if (dir && dir.length > 0) {
             _outDir = dir[0];
+            event.sender.send("out-directory", _outDir);
         }
     });
 });
 
-ipcMain.on("export", (event: Electron.Event)=>{
-    if (_outDir == "" || _files.length == 0) { return; }
-    let excel = new Excel();
-    for (let i=0; i<_files.length; ++i) {
-        excel.Open(_files[i]);
-        const xmlStr = excel.ToXmlString();
-        if (xmlStr != "") {
-            fs.writeFile(_outDir + "/" + i + ".xml", xmlStr, (err)=>{
-                console.log(err);
+ipcMain.on("export", (event: Electron.Event, exportType: string) => {
+    if (_outDir == "" || _srcFiles.length == 0) {
+        return;
+    }
+    if (exportType == "XML") {
+        let excel = new Excel();
+        for (let i = 0; i < _srcFiles.length; ++i) {
+            excel.Open(_outDir + "/" + _srcFiles[i]);
+            const xmlStr = excel.ToXmlString();
+            if (xmlStr == "") {
+                continue;
+            }
+            let filename = _srcFiles[i].replace(path.extname(_srcFiles[i]), "");
+            fs.writeFile(_outDir + "/" + filename + ".xml", xmlStr, (err) => {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        }
+    } else if (exportType == "JSON") {
+        let excel = new Excel();
+        for (let i = 0; i < _srcFiles.length; ++i) {
+            excel.Open(_outDir + "/" + _srcFiles[i]);
+            const jsonStr = excel.ToJsonString();
+            if (jsonStr == "") {
+                continue;
+            }
+            let filename = _srcFiles[i].replace(path.extname(_srcFiles[i]), "");
+            fs.writeFile(_outDir + "/" + filename + ".json", jsonStr, (err) => {
+                if (err) {
+                    console.log(err);
+                }
             });
         }
     }

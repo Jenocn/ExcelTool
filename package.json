@@ -12,6 +12,7 @@
     "xlsx": "^0.14.2"
   },
   "devDependencies": {
-    "@types/node": "^11.13.7"
+    "@types/node": "^11.13.7",
+    "electron": "^4.1.5"
   }
 }

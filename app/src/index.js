@@ -4,6 +4,7 @@ var vm = new Vue({
 	el: "#app",
 	data: {
 		files: [],
+		srcDir:"./src/",
 		outDir:"./out/"
 	},
 	methods: {
@@ -13,13 +14,14 @@ var vm = new Vue({
 		OnOutDir: function() {
 			electron.ipcRenderer.send("open-file-dialog-out");
 		},
-		OnExport: function() {
-			electron.ipcRenderer.send("export");
+		OnExport: function(type) {
+			electron.ipcRenderer.send("export", type);
 		}
 	}
 });
 
-electron.ipcRenderer.on("selected-directory", (e, files) => {
+electron.ipcRenderer.on("selected-directory", (e, dir, files) => {
+	vm.srcDir = dir;
 	vm.files = files;
 });
 electron.ipcRenderer.on("out-directory", (e, dir)=>{

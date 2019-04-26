@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
     <link rel="stylesheet" href="./css/index.css">
 </head>
+
 <body>
-<div id="app">
-    <button v-on:click="OnSelectDir">选择文件</button><br>
-    <button v-on:click="OnOutDir">导出目录</button> {{outDir}}<br>
-    <button v-on:click="OnExport">导出</button><br>
-    <ul>
-        <li v-for="file in files">{{file}}</li>
-    </ul>
-</div>
+    <div id="app">
+        <button v-on:click="OnSelectDir">选择目录</button> {{srcDir}}<br>
+        <button v-on:click="OnOutDir">导出目录</button> {{outDir}}<br>
+        <button v-on:click="OnExport('XML')">导出 XML</button><br>
+        <button v-on:click="OnExport('JSON')">导出 JSON</button><br>
+        <ul>
+            <li v-for="file in files">{{file}}</li>
+        </ul>
+    </div>
 </body>
-<script src="plugin/vue.min.js"></script>
-<script src="js/index.js"></script>
+<script src="./plugin/vue.min.js"></script>
+<script src="./js/index.js"></script>
+
 </html>
