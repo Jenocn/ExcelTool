@@ -1,5 +1,6 @@
 node_modules/
 dist/
 app/js/
+app/res/out/
 
 *.vscode
