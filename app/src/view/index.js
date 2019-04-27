@@ -8,19 +8,22 @@ var vm = new Vue({
 		srcDir: "./src",
 		outDir: "./out",
 		inputShow: false,
-		popupText: ""
+		popupText: "",
+		currentSelected: ""
 	},
 	created: function () {
-		electron.ipcRenderer.on("index-init", (e, targets, srcDir, outDir, files) => {
+		electron.ipcRenderer.on("index-init", (e, targets, srcDir, outDir, files, selected) => {
 			vm.targets = targets;
 			vm.srcDir = srcDir;
 			vm.outDir = outDir;
 			vm.files = files;
+			vm.currentSelected = selected;
 		});
-		electron.ipcRenderer.on("reload-files", (e, srcDir, outDir, files)=>{
+		electron.ipcRenderer.on("reload-files", (e, srcDir, outDir, files, selected)=>{
 			vm.srcDir = srcDir;
 			vm.outDir = outDir;
 			vm.files = files;
+			vm.currentSelected = selected;
 		});
 		electron.ipcRenderer.on("selected-directory", (e, dir, files) => {
 			vm.srcDir = dir;
@@ -36,6 +39,7 @@ var vm = new Vue({
 				vm.srcDir = "";
 				vm.outDir = "";
 				vm.files = [];
+				vm.currentSelected = name;
 			} else {
 				alert("The name: [" + name + "] is exist");
 			}

@@ -68,7 +68,7 @@ ipcMain.on("request-init", (event: Electron.Event) => {
         }
     }
     let targets = UserData.GetValue("targets", ["default"]);
-    event.sender.send("index-init", targets, srcDir, outDir, files);
+    event.sender.send("index-init", targets, srcDir, outDir, files, selectedName);
 });
 
 ipcMain.on("open-file-dialog-select", (event: Electron.Event) => {
@@ -176,5 +176,5 @@ ipcMain.on("click-project", (e: Electron.Event, target: string)=>{
             files[i] = path.relative(srcDir, files[i]);
         }
     }
-    e.sender.send("reload-files", srcDir, outDir, files);
+    e.sender.send("reload-files", srcDir, outDir, files, target);
 });

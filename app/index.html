@@ -10,7 +10,8 @@
 <body>
     <div id="app">
         <p><button v-on:click="OnAddProject">新增</button><button v-on:click="">删除选中</button></p>
-        <p><button v-on:click="OnProjectClick(target)" v-for="(target, index) in targets" :id="'btn_proj_' + index">{{ target }}</button></p>
+        <p><button v-on:click="OnProjectClick(target)" v-for="(target, index) in targets" :id="'btn_proj_' + index">{{target}}</button></p>
+        <p>当前:{{currentSelected}}</p>
         <button v-on:click="OnSelectDir" class="">选择目录</button> {{srcDir}}<br>
         <button v-on:click="OnOutDir" class="">导出目录</button> {{outDir}}<br>
         <button v-on:click="OnExport('XML')" class="">导出 XML</button>
