@@ -49,7 +49,10 @@ ipcMain.on("request-init", (event: Electron.Event) => {
 
     let outDir = UserData.GetValue("outDir", "./out");
     let srcDir = UserData.GetValue("srcDir", "./src");
-    let files = FileTool.GetFilesFromDirectory(srcDir, [".xls", ".xlsx"]);
+    let files = FileTool.GetFilesFromDirectory(srcDir, true, [".xls", ".xlsx"]);
+    for (let i =0; i<files.length; ++i) {
+        files[i] = path.relative(srcDir, files[i]);
+    }
     event.sender.send("index-init", srcDir, outDir, files);
 });
 
@@ -61,7 +64,10 @@ ipcMain.on("open-file-dialog-select", (event: Electron.Event) => {
             return;
         }
         UserData.SetValue("srcDir", dir[0]);
-        let srcFiles = FileTool.GetFilesFromDirectory(dir[0], [".xls", ".xlsx"]);
+        let srcFiles = FileTool.GetFilesFromDirectory(dir[0], true, [".xls", ".xlsx"]);
+        for (let i =0; i<srcFiles.length; ++i) {
+            srcFiles[i] = path.relative(dir[0], srcFiles[i]);
+        }
         event.sender.send("selected-directory", dir[0], srcFiles);
     });
 });
@@ -95,8 +101,8 @@ ipcMain.on("export", (event: Electron.Event, exportType: string, srcDir: string,
             if (xmlStr == "") {
                 continue;
             }
-            let filename = FileTool.GetPureFilenameFromAbsolutionPath(files[i]);
-            FileTool.WriteToFile(outDir + "/" + filename + ".xml", xmlStr);
+            let baseName = files[i].replace(path.extname(files[i]), "");
+            FileTool.WriteToFile(outDir + "/" + baseName + ".xml", xmlStr);
         }
     } else if (exportType == "JSON") {
         let excel = new Excel();
@@ -106,8 +112,8 @@ ipcMain.on("export", (event: Electron.Event, exportType: string, srcDir: string,
             if (jsonStr == "") {
                 continue;
             }
-            let filename = FileTool.GetPureFilenameFromAbsolutionPath(files[i]);
-            FileTool.WriteToFile(outDir + "/" + filename + ".json", jsonStr);
+            let baseName = files[i].replace(path.extname(files[i]), "");
+            FileTool.WriteToFile(outDir + "/" + baseName + ".json", jsonStr);
         }
     }
 });

@@ -2,10 +2,11 @@ import fs from 'fs';
 import path from 'path';
 
 export default class FileTool {
-    public static GetFilesFromDirectory(dir: string, filter?: string[]): string[] {
+    public static GetFilesFromDirectory(dir: string, bRecursion: boolean, filter?: string[]): string[] {
         if (!fs.existsSync(dir)) {
             return [];
         }
+        // search dir
         let tempFiles = fs.readdirSync(dir);
         if (!filter || filter.length == 0) {
             return [];
@@ -13,31 +14,35 @@ export default class FileTool {
         let files: string[] = [];
         for (const item of tempFiles) {
             let extName = path.extname(item);
+            if (bRecursion && extName == "") {
+                files = files.concat(this.GetFilesFromDirectory(dir + "/" + item, true, filter));
+            }
             if (filter.includes(extName)) {
-                files.push(item);
+                files.push(dir + "/" + item);
             }
         }
         return files;
     }
 
-    public static GetDirectoryFromAbsolutionPath(absolution: string): string {
-        return path.dirname(absolution);
-    }
-
-    public static GetFilenameFromAbsolutionPath(absolution: string): string {
-        return path.basename(absolution);
-    }
-
-    public static GetPureFilenameFromAbsolutionPath(absolution: string): string {
-        return path.basename(absolution, path.extname(absolution));
-    }
-
-
-    public static WriteToFile(path: string, str: string) {
-        fs.writeFile(path, str, {}, (err) => {
+    public static WriteToFile(file: string, str: string) {
+        let dir = path.dirname(file);
+        this.CreateDir(dir);
+        fs.writeFile(file, str, {}, (err) => {
             if (err) {
                 console.log(err);
             }
         });
+    }
+
+    public static CreateDir(dir: string) {
+        if (fs.existsSync(dir)) {
+            return;
+        }
+        let lastDir = path.dirname(dir);
+        if (fs.existsSync(lastDir)) {
+            fs.mkdirSync(dir);
+        } else {
+            this.CreateDir(lastDir);
+        }
     }
 }
