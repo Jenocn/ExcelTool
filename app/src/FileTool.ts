@@ -7,6 +7,10 @@ export default class FileTool {
             return [];
         }
         // search dir
+        let stat = fs.statSync(dir);
+        if (!stat.isDirectory()) {
+            return [];
+        }
         let tempFiles = fs.readdirSync(dir);
         if (!filter || filter.length == 0) {
             return [];
