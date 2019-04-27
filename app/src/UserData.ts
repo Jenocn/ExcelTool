@@ -30,4 +30,10 @@ export default class UserData {
         }
         return value;
     }
+
+    public static RemoveValue(key: string) {
+        if (this._data[key]) {
+            delete this._data[key];
+        }
+    }
 }

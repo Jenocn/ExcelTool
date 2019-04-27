@@ -48,6 +48,7 @@ var vm = new Vue({
 		electron.ipcRenderer.send("request-init");
 	},
 	mounted: function () {
+
 	},
 	methods: {
 		OnSelectDir: function () {
@@ -61,6 +62,12 @@ var vm = new Vue({
 		},
 		OnAddProject: function () {
 			vm.inputShow = true;
+		},
+		OnRemoveCurrent: function() {
+			electron.ipcRenderer.send("delete-project", vm.currentSelected);
+		},
+		OnClear: function() {
+			electron.ipcRenderer.send("delete-all");
 		},
 		OnPopupInput: function (bOk) {
 			if (bOk) {

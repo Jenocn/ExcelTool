@@ -125,7 +125,7 @@ ipcMain.on("export", (event: Electron.Event, exportType: string, srcDir: string,
             let baseName = files[i].replace(path.extname(files[i]), "");
             FileTool.WriteToFile(outDir + "/" + baseName + ".xml", xmlStr);
         }
-        dialog.showMessageBox({message:"Export success!"});
+        dialog.showMessageBox({ message: "Export success!" });
     } else if (exportType == "JSON") {
         let excel = new Excel();
         for (let i = 0; i < files.length; ++i) {
@@ -137,7 +137,7 @@ ipcMain.on("export", (event: Electron.Event, exportType: string, srcDir: string,
             let baseName = files[i].replace(path.extname(files[i]), "");
             FileTool.WriteToFile(outDir + "/" + baseName + ".json", jsonStr);
         }
-        dialog.showMessageBox({message:"Export success!"});
+        dialog.showMessageBox({ message: "Export success!" });
     }
 });
 
@@ -162,7 +162,39 @@ ipcMain.on("new-project", (e: Electron.Event, name: string) => {
     e.sender.send("new-project-result", bSuccess, name);
 });
 
-ipcMain.on("click-project", (e: Electron.Event, target: string)=>{
+ipcMain.on("delete-project", (e: Electron.Event, target: string) => {
+    UserData.RemoveValue(target);
+    UserData.SetValue("selected", "default");
+    let projectObj = UserData.GetValue("default", null);
+    let srcDir = "";
+    let outDir = "";
+    let files: string[] = [];
+    if (projectObj) {
+        srcDir = projectObj.srcDir;
+        outDir = projectObj.outDir;
+        files = FileTool.GetFilesFromDirectory(srcDir, true, [".xls", ".xlsx"]);
+        for (let i = 0; i < files.length; ++i) {
+            files[i] = path.relative(srcDir, files[i]);
+        }
+    }
+    let targets = UserData.GetValue("targets", ["default"]);
+    if (target != "default") {
+        targets.splice(targets.indexOf(target), 1);
+        UserData.SetValue("targets", targets);
+    }
+    e.sender.send("index-init", targets, srcDir, outDir, files, "default");
+});
+
+ipcMain.on("delete-all", (e: Electron.Event) => {
+    let targets = UserData.GetValue("targets", ["default"]);
+    for (const item of targets) {
+        UserData.RemoveValue(item);
+    }
+    UserData.SetValue("targets", ["default"]);
+    e.sender.send("index-init", ["default"], "", "", [], "default");
+});
+
+ipcMain.on("click-project", (e: Electron.Event, target: string) => {
     UserData.SetValue("selected", target);
     let projectObj = UserData.GetValue(target, null);
     let srcDir = "";
