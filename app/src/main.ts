@@ -16,17 +16,25 @@ const menuTemplate = [
         submenu: [
             {
                 label: "Exit",
-                click: ()=>{
+                click: () => {
                     app.quit();
                 }
             }
         ]
+    },
+    {
+        label: "Refresh",
+        click: () => {
+            if (win) {
+                win.reload();
+            }
+        }
     }
 ];
 
 function CreateWindow(): void {
     win = new BrowserWindow(winOption);
-    win.on("closed", ()=>{
+    win.on("closed", () => {
         win = null;
         UserData.SaveToFile();
         app.exit(0);
@@ -46,14 +54,21 @@ function _OnReady(): void {
 app.on("ready", _OnReady);
 
 ipcMain.on("request-init", (event: Electron.Event) => {
-
-    let outDir = UserData.GetValue("outDir", "./out");
-    let srcDir = UserData.GetValue("srcDir", "./src");
-    let files = FileTool.GetFilesFromDirectory(srcDir, true, [".xls", ".xlsx"]);
-    for (let i =0; i<files.length; ++i) {
-        files[i] = path.relative(srcDir, files[i]);
+    let selectedName = UserData.GetValue("selected", "default");
+    let selectedProject = UserData.GetValue(selectedName, null);
+    let outDir = "";
+    let srcDir = "";
+    let files: string[] = [];
+    if (selectedProject) {
+        outDir = selectedProject.outDir;
+        srcDir = selectedProject.srcDir;
+        files = FileTool.GetFilesFromDirectory(srcDir, true, [".xls", ".xlsx"]);
+        for (let i = 0; i < files.length; ++i) {
+            files[i] = path.relative(srcDir, files[i]);
+        }
     }
-    event.sender.send("index-init", srcDir, outDir, files);
+    let targets = UserData.GetValue("targets", ["default"]);
+    event.sender.send("index-init", targets, srcDir, outDir, files);
 });
 
 ipcMain.on("open-file-dialog-select", (event: Electron.Event) => {
@@ -63,9 +78,12 @@ ipcMain.on("open-file-dialog-select", (event: Electron.Event) => {
         if (!dir || dir.length == 0) {
             return;
         }
-        UserData.SetValue("srcDir", dir[0]);
+        let selectedName = UserData.GetValue("selected", "default");
+        let selectedProject = UserData.GetValue(selectedName, {});
+        selectedProject.srcDir = dir[0];
+        UserData.SetValue(selectedName, selectedProject);
         let srcFiles = FileTool.GetFilesFromDirectory(dir[0], true, [".xls", ".xlsx"]);
-        for (let i =0; i<srcFiles.length; ++i) {
+        for (let i = 0; i < srcFiles.length; ++i) {
             srcFiles[i] = path.relative(dir[0], srcFiles[i]);
         }
         event.sender.send("selected-directory", dir[0], srcFiles);
@@ -77,7 +95,10 @@ ipcMain.on("open-file-dialog-out", (event: Electron.Event) => {
         properties: ["openFile", "openDirectory"]
     }, (dir: string[]) => {
         if (dir && dir.length > 0) {
-            UserData.SetValue("outDir", dir[0]);
+            let selectedName = UserData.GetValue("selected", "default");
+            let selectedProject = UserData.GetValue(selectedName, {});
+            selectedProject.outDir = dir[0];
+            UserData.SetValue(selectedName, selectedProject);
             event.sender.send("out-directory", dir[0]);
         }
     });
@@ -104,6 +125,7 @@ ipcMain.on("export", (event: Electron.Event, exportType: string, srcDir: string,
             let baseName = files[i].replace(path.extname(files[i]), "");
             FileTool.WriteToFile(outDir + "/" + baseName + ".xml", xmlStr);
         }
+        dialog.showMessageBox({message:"Export success!"});
     } else if (exportType == "JSON") {
         let excel = new Excel();
         for (let i = 0; i < files.length; ++i) {
@@ -115,5 +137,44 @@ ipcMain.on("export", (event: Electron.Event, exportType: string, srcDir: string,
             let baseName = files[i].replace(path.extname(files[i]), "");
             FileTool.WriteToFile(outDir + "/" + baseName + ".json", jsonStr);
         }
+        dialog.showMessageBox({message:"Export success!"});
     }
+});
+
+ipcMain.on("new-project", (e: Electron.Event, name: string) => {
+    let bSuccess = false;
+    if (name != "") {
+        let value = UserData.GetValue(name, null);
+        if (value == null) {
+            UserData.SetValue(name, {
+                outDir: "",
+                srcDir: ""
+            });
+            let targets = UserData.GetValue("targets", ["default"]);
+            if (!targets.includes(name)) {
+                targets.push(name);
+            }
+            UserData.SetValue("targets", targets);
+            UserData.SetValue("selected", name);
+            bSuccess = true;
+        }
+    }
+    e.sender.send("new-project-result", bSuccess, name);
+});
+
+ipcMain.on("click-project", (e: Electron.Event, target: string)=>{
+    UserData.SetValue("selected", target);
+    let projectObj = UserData.GetValue(target, null);
+    let srcDir = "";
+    let outDir = "";
+    let files: string[] = [];
+    if (projectObj) {
+        srcDir = projectObj.srcDir;
+        outDir = projectObj.outDir;
+        files = FileTool.GetFilesFromDirectory(srcDir, true, [".xls", ".xlsx"]);
+        for (let i = 0; i < files.length; ++i) {
+            files[i] = path.relative(srcDir, files[i]);
+        }
+    }
+    e.sender.send("reload-files", srcDir, outDir, files);
 });

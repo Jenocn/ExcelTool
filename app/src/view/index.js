@@ -4,14 +4,23 @@ var vm = new Vue({
 	el: "#app",
 	data: {
 		files: [],
+		targets: ["default"],
 		srcDir: "./src",
-		outDir: "./out"
+		outDir: "./out",
+		inputShow: false,
+		popupText: ""
 	},
 	created: function () {
-		electron.ipcRenderer.on("index-init", (e, srcDir, outDir, files)=>{
+		electron.ipcRenderer.on("index-init", (e, targets, srcDir, outDir, files) => {
+			vm.targets = targets;
 			vm.srcDir = srcDir;
-            vm.outDir = outDir;
-            vm.files = files;
+			vm.outDir = outDir;
+			vm.files = files;
+		});
+		electron.ipcRenderer.on("reload-files", (e, srcDir, outDir, files)=>{
+			vm.srcDir = srcDir;
+			vm.outDir = outDir;
+			vm.files = files;
 		});
 		electron.ipcRenderer.on("selected-directory", (e, dir, files) => {
 			vm.srcDir = dir;
@@ -20,8 +29,21 @@ var vm = new Vue({
 		electron.ipcRenderer.on("out-directory", (e, dir) => {
 			vm.outDir = dir;
 		});
+		electron.ipcRenderer.on("new-project-result", (e, bSuccess, name)=>{
+			if (bSuccess) {
+				vm.inputShow = false;
+				vm.targets.push(name);
+				vm.srcDir = "";
+				vm.outDir = "";
+				vm.files = [];
+			} else {
+				alert("The name: [" + name + "] is exist");
+			}
+		});
 
 		electron.ipcRenderer.send("request-init");
+	},
+	mounted: function () {
 	},
 	methods: {
 		OnSelectDir: function () {
@@ -32,6 +54,20 @@ var vm = new Vue({
 		},
 		OnExport: function (type) {
 			electron.ipcRenderer.send("export", type, vm.srcDir, vm.outDir, vm.files);
+		},
+		OnAddProject: function () {
+			vm.inputShow = true;
+		},
+		OnPopupInput: function (bOk) {
+			if (bOk) {
+				electron.ipcRenderer.send("new-project", vm.popupText);
+			} else {
+				vm.inputShow = false;
+			}
+			vm.popupText = "";
+		},
+		OnProjectClick: function(target) {
+			electron.ipcRenderer.send("click-project", target);
 		}
 	}
 });

@@ -9,13 +9,22 @@
 
 <body>
     <div id="app">
-        <button v-on:click="OnSelectDir">选择目录</button> {{srcDir}}<br>
-        <button v-on:click="OnOutDir">导出目录</button> {{outDir}}<br>
-        <button v-on:click="OnExport('XML')">导出 XML</button>
-        <button v-on:click="OnExport('JSON')">导出 JSON</button><br>
-        <ul id="xlsx_list">
-            <li v-for="file in files">{{file}}</li>
+        <p><button v-on:click="OnAddProject">新增</button><button v-on:click="">删除选中</button></p>
+        <p><button v-on:click="OnProjectClick(target)" v-for="(target, index) in targets" :id="'btn_proj_' + index">{{ target }}</button></p>
+        <button v-on:click="OnSelectDir" class="">选择目录</button> {{srcDir}}<br>
+        <button v-on:click="OnOutDir" class="">导出目录</button> {{outDir}}<br>
+        <button v-on:click="OnExport('XML')" class="">导出 XML</button>
+        <button v-on:click="OnExport('JSON')" class="">导出 JSON</button><br>
+        <ul class="xlsx_list">
+            <li v-for="file in files" class="">{{file}}</li>
         </ul>
+        <div v-if="inputShow">
+            <div class="popup_block"></div>
+            <div class="popup_input">
+                <input v-model="popupText" type="text" placeholder="请输入项目名称"><br>
+                <button v-on:click="OnPopupInput(true)" class="popup_input_button">确定</button><button v-on:click="OnPopupInput(false)" class="popup_input_button">取消</button>
+            </div>
+        </div>
     </div>
 </body>
 <script src="./plugin/vue.min.js"></script>

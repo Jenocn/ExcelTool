@@ -19,11 +19,11 @@ export default class UserData {
         fs.writeFileSync(this._filename, JSON.stringify(this._data));
     }
 
-    public static SetValue(key: string, value: string) {
+    public static SetValue(key: string, value: any) {
         this._data[key] = value;
     }
 
-    public static GetValue(key: string, defaultValue: string): string {
+    public static GetValue(key: string, defaultValue: any): any {
         let value = this._data[key];
         if (!value) {
             return defaultValue;
