@@ -17,6 +17,7 @@
         <button v-on:click="OnExport('XML')" class="">导出 XML</button>
         <button v-on:click="OnExport('JSON')" class="">导出 JSON</button><br>
         <ul class="xlsx_list">
+            <p v-if="files.length == 0">该目录下没有找到Excel文件(.xls .xlsx)</p>
             <li v-for="file in files" class="">{{file}}</li>
         </ul>
         <div v-if="inputShow">
