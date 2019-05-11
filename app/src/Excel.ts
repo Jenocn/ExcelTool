@@ -53,7 +53,7 @@ export default class Excel {
                 let r = "<item ";
                 for (const key in obj) {
                     const value = obj[key];
-                    r += "\"" + key + "\"=" + "\"" + value + "\" ";
+                    r += key + "=" + "\"" + value + "\" ";
                 }
                 r += "/>";
                 return r;
