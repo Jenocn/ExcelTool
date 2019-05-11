@@ -19,7 +19,7 @@ var vm = new Vue({
 			vm.files = files;
 			vm.currentSelected = selected;
 		});
-		electron.ipcRenderer.on("reload-files", (e, srcDir, outDir, files, selected)=>{
+		electron.ipcRenderer.on("reload-files", (e, srcDir, outDir, files, selected) => {
 			vm.srcDir = srcDir;
 			vm.outDir = outDir;
 			vm.files = files;
@@ -32,7 +32,7 @@ var vm = new Vue({
 		electron.ipcRenderer.on("out-directory", (e, dir) => {
 			vm.outDir = dir;
 		});
-		electron.ipcRenderer.on("new-project-result", (e, bSuccess, name)=>{
+		electron.ipcRenderer.on("new-project-result", (e, bSuccess, name) => {
 			if (bSuccess) {
 				vm.inputShow = false;
 				vm.targets.push(name);
@@ -43,6 +43,23 @@ var vm = new Vue({
 			} else {
 				alert("The name: [" + name + "] is exist");
 			}
+		});
+		electron.ipcRenderer.on("export-result", (e, errorList, successList) => {
+			let showMessage = "";
+			if (errorList.length > 0) {
+				showMessage += "以下文件解析失败!\n";
+				for (const str of errorList) {
+					showMessage += "[!] " + str + "\n";
+				}
+				showMessage += "------------------\n";
+			}
+			if (successList.length > 0) {
+				showMessage += "此次导出:\n";
+				for (const str of successList) {
+					showMessage += "[√] " + str + "\n";
+				}
+			}
+			alert(showMessage);
 		});
 
 		electron.ipcRenderer.send("request-init");
@@ -63,10 +80,10 @@ var vm = new Vue({
 		OnAddProject: function () {
 			vm.inputShow = true;
 		},
-		OnRemoveCurrent: function() {
+		OnRemoveCurrent: function () {
 			electron.ipcRenderer.send("delete-project", vm.currentSelected);
 		},
-		OnClear: function() {
+		OnClear: function () {
 			electron.ipcRenderer.send("delete-all");
 		},
 		OnPopupInput: function (bOk) {
@@ -77,7 +94,7 @@ var vm = new Vue({
 			}
 			vm.popupText = "";
 		},
-		OnProjectClick: function(target) {
+		OnProjectClick: function (target) {
 			electron.ipcRenderer.send("click-project", target);
 		}
 	}

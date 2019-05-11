@@ -25,7 +25,7 @@ export default class Excel {
     }
 
     public ToJsonString(): string {
-        if (!this._data || this._data.length == 0) {
+        if (!this._data || !this._data.length) {
             return "";
         }
         if (this._jsonString == "") {
@@ -38,7 +38,7 @@ export default class Excel {
         if (this._xmlString != "") {
             return this._xmlString;
         }
-        if (!this._data || this._data.length == 0) {
+        if (!this._data || !this._data.length) {
             return "";
         }
 

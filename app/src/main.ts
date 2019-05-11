@@ -115,29 +115,39 @@ ipcMain.on("export", (event: Electron.Event, exportType: string, srcDir: string,
         outDir = outDir.substr(0, outDir.length - 1);
     }
     if (exportType == "XML") {
+        let errorList: string[] = [];
+        let successList: string[] = [];
         let excel = new Excel();
         for (let i = 0; i < files.length; ++i) {
             excel.Open(srcDir + "/" + files[i]);
             const xmlStr = excel.ToXmlString();
             if (xmlStr == "") {
+                errorList.push(files[i]);
                 continue;
             }
             let baseName = files[i].replace(path.extname(files[i]), "");
-            FileTool.WriteToFile(outDir + "/" + baseName + ".xml", xmlStr);
+            let filename = baseName + ".xml";
+            FileTool.WriteToFile(outDir + "/" + filename, xmlStr);
+            successList.push(filename);
         }
-        dialog.showMessageBox({ message: "Export success!" });
+        event.sender.send("export-result", errorList, successList);
     } else if (exportType == "JSON") {
+        let errorList: string[] = [];
+        let successList: string[] = [];
         let excel = new Excel();
         for (let i = 0; i < files.length; ++i) {
             excel.Open(srcDir + "/" + files[i]);
             const jsonStr = excel.ToJsonString();
             if (jsonStr == "") {
+                errorList.push(files[i]);
                 continue;
             }
             let baseName = files[i].replace(path.extname(files[i]), "");
+            let filename = baseName + ".json";
             FileTool.WriteToFile(outDir + "/" + baseName + ".json", jsonStr);
+            successList.push(filename);
         }
-        dialog.showMessageBox({ message: "Export success!" });
+        event.sender.send("export-result", errorList, successList);
     }
 });
 
