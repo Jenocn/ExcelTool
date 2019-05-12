@@ -120,7 +120,7 @@ ipcMain.on("export", (event: Electron.Event, exportType: string, srcDir: string,
         let excel = new Excel();
         for (let i = 0; i < files.length; ++i) {
             excel.Open(srcDir + "/" + files[i]);
-            const xmlStr = excel.ToXmlString();
+            const xmlStr = excel.ToXmlString(true);
             if (xmlStr == "") {
                 errorList.push(files[i]);
                 continue;
@@ -137,7 +137,7 @@ ipcMain.on("export", (event: Electron.Event, exportType: string, srcDir: string,
         let excel = new Excel();
         for (let i = 0; i < files.length; ++i) {
             excel.Open(srcDir + "/" + files[i]);
-            const jsonStr = excel.ToJsonString();
+            const jsonStr = excel.ToJsonString(true);
             if (jsonStr == "") {
                 errorList.push(files[i]);
                 continue;
