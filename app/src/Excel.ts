@@ -24,17 +24,54 @@ export default class Excel {
         })(workbook);
     }
 
-    public ToJsonString(): string {
+    public ToJsonString(format: boolean = false): string {
+        if (this._jsonString != "") {
+            return this._jsonString;
+        }
         if (!this._data || !this._data.length) {
             return "";
         }
-        if (this._jsonString == "") {
+
+        if (!format) {
             this._jsonString = JSON.stringify(this._data);
+            return this._jsonString;
         }
-        return this._jsonString;
+
+        let ret = "[\n";
+        for (let i = 0; i < this._data.length; ++i) {
+            const child = this._data[i];
+            if (!child || child.length == 0) {
+                continue;
+            }
+            let lineStr = ((obj: any) => {
+                let r = "{";
+                let tail = "";
+                for (const key in obj) {
+                    const value = obj[key];
+                    let isString = typeof(value) == "string";
+                    let refSign = isString ? "\"" : "";
+                    r += tail + "\"" + key + "\"" + ":" + refSign + value + refSign;
+                    tail = ",";
+                }
+                r += "}";
+                return r;
+            })(child);
+            
+            ret += "\t";
+            ret += lineStr;
+            if (i < this._data.length - 1) {
+                ret += ",";
+            }
+            ret += "\n";
+        }
+
+        ret += "]";
+        this._jsonString = ret;
+
+        return ret;
     }
 
-    public ToXmlString(): string {
+    public ToXmlString(format: boolean = false): string {
         if (this._xmlString != "") {
             return this._xmlString;
         }
@@ -42,7 +79,11 @@ export default class Excel {
             return "";
         }
 
-        let ret = "<root>\n";
+        let newLineSign = format ? "\n" : "";
+        let tabSign = format ? "\t" : "";
+
+        let ret = "<root>";
+        ret += newLineSign;
 
         for (let i = 0; i < this._data.length; ++i) {
             const child = this._data[i];
@@ -59,9 +100,9 @@ export default class Excel {
                 return r;
             })(child);
 
-            ret += "\t";
+            ret += tabSign;
             ret += lineStr;
-            ret += "\n";
+            ret += newLineSign;
         }
 
         ret += "</root>";
