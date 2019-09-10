@@ -6,9 +6,9 @@
 Excel的优点是可以借助微软强大的编辑器处理和检查数据,而开发的时候,读取json/xml这类格式显然更适合一些,在游戏开发中,会使用到大量的配置文件,如果直接去配json/xml则不太效率,所以我开发了ExcelTool用于转换Excel到json/xml
 
 ## 表格结构和导出结构  
-![Img](readme/img2.png)
-![Img](readme/img3.png)
-![Img](readme/img4.png)
+![Img](readme/img2.png)  
+![Img](readme/img3.png)  
+![Img](readme/img4.png)  
 
 ## 操作界面  
 
