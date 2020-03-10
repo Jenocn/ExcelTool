@@ -10,6 +10,7 @@
   "author": "Jenocn",
   "license": "ISC",
   "dependencies": {
+    "vue": "^2.6.11",
     "xlsx": "^0.14.2"
   },
   "devDependencies": {
