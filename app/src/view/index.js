@@ -1,4 +1,5 @@
-let electron = require('electron')
+let Vue = require('vue');
+let electron = require('electron');
 
 var vm = new Vue({
 	el: "#app",
