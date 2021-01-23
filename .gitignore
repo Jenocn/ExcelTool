@@ -1,6 +1,6 @@
-node_modules/
-dist/
-app/js/
-app/res/out/
+/node_modules
+/app/dist
+/app/js/
+/app/res/out
 
 *.vscode
